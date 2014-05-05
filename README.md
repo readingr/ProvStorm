@@ -16,6 +16,6 @@ To get started:
 
 The test concludes once it's found  "e6", the test can be modified easily by:
 
-*Adding prov to search for in ProvStream.java
-*Changing the random variable in ProvStream.java
-*Changing the initial variable in ProvSpout.java
+* Adding prov to search for in ProvStream.java
+* Changing the random variable in ProvStream.java
+* Changing the initial variable in ProvSpout.java
