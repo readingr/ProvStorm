@@ -14,6 +14,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -49,12 +50,18 @@ public class TestClient {
             //this reads the XML.
             for (int i = 0; i < nList.getLength(); i++) {
     			Node nNode = nList.item(i);
+    			
+    			//cast to element so we can traverse.
+    			Element docElement = (Element)nNode;
+    		
+    			System.out.println(docElement.getElementsByTagName("prov:generatedEntity").item(0).getAttributes().getNamedItem("prov:ref").getTextContent());			
     			System.out.println(nNode.getNodeName());
-    	        System.out.println(doc.getElementsByTagName("prov:entity").item(i).getAttributes().getNamedItem("prov:id").getTextContent());
-    		}
+    			System.out.println(docElement.getElementsByTagName("prov:usedEntity").item(0).getAttributes().getNamedItem("prov:ref").getTextContent());			
+    			System.out.println("\n");
+
+            }
             
-//            System.out.println(doc.getElementsByTagName("prov:entity"));
-//            System.out.println("Message: " + message);
+            
             ois.close();
             Thread.sleep(100);
         }        

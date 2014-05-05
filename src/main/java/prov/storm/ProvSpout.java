@@ -20,6 +20,13 @@ package prov.storm;
 import backtype.storm.Config;
 import backtype.storm.topology.OutputFieldsDeclarer;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.StringReader;
+import java.net.InetAddress;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 import backtype.storm.spout.SpoutOutputCollector;
@@ -33,8 +40,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 
 public class ProvSpout extends BaseRichSpout {
@@ -42,7 +59,6 @@ public class ProvSpout extends BaseRichSpout {
 	boolean _isDistributed;
 	SpoutOutputCollector _collector;
 	int count;
-	ArrayList<String[]> action = new ArrayList<String[]>();
 
 	public ProvSpout() {
 		this(true);
@@ -56,13 +72,6 @@ public class ProvSpout extends BaseRichSpout {
 		_collector = collector;
 		count = 0;
 
-		action.add(new String[]{"entity","e1", null});
-		action.add(new String[]{"entity", "e2", null});
-		action.add(new String[]{"wasDerivedFrom", "e2", "e1"});
-		action.add(new String[]{"wasDerivedFrom", "e3", "e2"});
-		action.add(new String[]{"wasDerivedFrom", "e4", "e3"});
-		action.add(new String[]{"wasDerivedFrom", "e5", "e1"});
-
 	}
 
 	public void close() {
@@ -70,39 +79,57 @@ public class ProvSpout extends BaseRichSpout {
 	}
 
 	public void nextTuple() {
-//		Utils.sleep(100);
-		//        final String[] words = new String[] {"Richard", "Nick", "Zara", "Tom", "Ben"};
-		final Random rand = new Random();
-		//        final String word = words[rand.nextInt(words.length)];
-
-		//        String[][] test = new String[][] {
-		//        		["entity"]
-		//        };
+		//		Utils.sleep(100);
 
 
-		//		for (int i = 0; i < action.size(); i++) {
-		//			String[] test = action.get(i);
-		//			_collector.emit(new Values(test[0], test[1], test[2]));
-		//		}
-		
-		int t = rand.nextInt(100);
+		InetAddress host;
+		try {
+			host = InetAddress.getLocalHost();
+			Socket socket = null;
+			ObjectOutputStream oos = null;
+			ObjectInputStream ois = null;
+			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder builder = factory.newDocumentBuilder();	    
 
-		if ( t == 0){
-			if(action.size() >0){
-				System.out.println("in here");
-				String[] test = action.get(0);
-				System.out.println(test);
-				action.remove(0);
-				_collector.emit(new Values(test[0], test[1], test[2]));
-			}
-			else{
-				System.out.println("PROGRAM FINISHED");
-			}
+	        socket = new Socket(host.getHostName(), 9876);
+	        ois = new ObjectInputStream(socket.getInputStream());
+	        
+	        //get from the XML stream
+	        String message = (String) ois.readObject();
+	        
+	        Document doc = builder.parse( new InputSource( new StringReader( message ) ) ); 
 
+            NodeList nList = doc.getElementsByTagName("prov:wasDerivedFrom");
+            
+            //take the derivations, and send them to the bolt
+            for (int i = 0; i < nList.getLength(); i++) {
+    			Node nNode = nList.item(i);
+    			
+    			//cast to element so we can traverse.
+    			Element docElement = (Element)nNode;
+    			
+    			//get the generated and used entities, and send them to the bolt
+    			String generatedEntity = docElement.getElementsByTagName("prov:generatedEntity").item(0).getAttributes().getNamedItem("prov:ref").getTextContent();			
+    			String usedEntity = docElement.getElementsByTagName("prov:usedEntity").item(0).getAttributes().getNamedItem("prov:ref").getTextContent();			
+    			_collector.emit(new Values("wasDerivedFrom", generatedEntity, usedEntity));
+
+            }
+            
+            
+            ois.close();
+	        
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		} catch (SAXException e) {
+			e.printStackTrace();
 		}
-		else{
-			_collector.emit(new Values("testData", "nothing", null));
-		}
+
 
 
 

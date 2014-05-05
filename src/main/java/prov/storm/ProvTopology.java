@@ -26,6 +26,7 @@ public class ProvTopology {
 		OutputCollector _collector;
 		String initialValue = "e1";
 		ArrayList<String> valuesToSearchFor;
+		int count;
 
 		@Override
 		public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
@@ -34,27 +35,29 @@ public class ProvTopology {
 			valuesToSearchFor.add(initialValue);
 
 
+
 		}
 
 		@Override
 		public void execute(Tuple tuple) {
 
-			//this below emits the tuple onto a new stream, after appending three ! marks. 
-			//      _collector.emit(tuple, new Values(tuple.getString(0) + "!!!" ));
-			//      _collector.ack(tuple);
 
 
 			//we check for the value we need.	
 			if (tuple.getString(0).equals("wasDerivedFrom")){
 				if(valuesToSearchFor.contains(tuple.getString(2))){
 					if(!valuesToSearchFor.contains(tuple.getString(1))){
-//						System.out.println("Value Found"); 
 						System.out.println("Found "+tuple.getString(1)+ " added to the list of values to search for"); 
 						valuesToSearchFor.add(tuple.getString(1));
 					}
 
 				}
 			}
+			
+			//this below emits the tuple onto a new stream, after appending three ! marks.
+			//this could be used to send the correct tuples to a new bolt, which could then email users.
+			//      _collector.emit(tuple, new Values(tuple.getString(0) + "!!!" ));
+			//      _collector.ack(tuple);
 
 
 		}

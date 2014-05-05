@@ -24,8 +24,6 @@ public class testing {
 	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
 		String t = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" + 
 				"<prov:document xmlns:prov=\"http://www.w3.org/ns/prov#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://example.org\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n" + 
-				"    <prov:entity prov:id=\"e1\"/>\n" + 
-				"    <prov:entity prov:id=\"e2\"/>\n" + 
 				"    <prov:wasDerivedFrom>\n" + 
 				"        <prov:generatedEntity prov:ref=\"e2\"/>\n" + 
 				"        <prov:usedEntity prov:ref=\"e1\"/>\n" + 
