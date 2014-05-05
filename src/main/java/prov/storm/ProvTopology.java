@@ -24,7 +24,10 @@ public class ProvTopology {
 
 	public static class ProvBolt extends BaseRichBolt {
 		OutputCollector _collector;
+		
 		String initialValue = "e1";
+		
+		
 		ArrayList<String> valuesToSearchFor;
 		int count;
 

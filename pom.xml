@@ -1,12 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.kaviddiss</groupId>
-  <artifactId>storm-twitter-word-count</artifactId>
+  <artifactId>prov-storm</artifactId>
   <packaging>jar</packaging>
   <version>0.1</version>
-  <name>Storm Twitter Word Count sample</name>
-  <url>http://kaviddiss.com</url>
+  <name>ProvStorm</name>
+  <url>https://github.com/readingr/ProvStorm</url>
 
   <dependencies>       
     <dependency>
@@ -88,5 +87,6 @@
     </repository>
   </repositories>
 
+  <groupId>com.prov.storm</groupId>
 </project>
 
