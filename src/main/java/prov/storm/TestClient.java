@@ -14,6 +14,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -41,9 +43,18 @@ public class TestClient {
             
             
             Document doc = builder.parse( new InputSource( new StringReader( message ) ) ); 
+
+            NodeList nList = doc.getElementsByTagName("prov:wasDerivedFrom");
             
-            System.out.println(doc.getElementsByTagName("prov:entity"));
-            System.out.println("Message: " + message);
+            //this reads the XML.
+            for (int i = 0; i < nList.getLength(); i++) {
+    			Node nNode = nList.item(i);
+    			System.out.println(nNode.getNodeName());
+    	        System.out.println(doc.getElementsByTagName("prov:entity").item(i).getAttributes().getNamedItem("prov:id").getTextContent());
+    		}
+            
+//            System.out.println(doc.getElementsByTagName("prov:entity"));
+//            System.out.println("Message: " + message);
             ois.close();
             Thread.sleep(100);
         }        

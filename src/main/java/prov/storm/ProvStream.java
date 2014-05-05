@@ -47,7 +47,10 @@ public class ProvStream {
 			//create ObjectOutputStream object
 			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
 			
-			oos.writeObject("<prov:entity prov:id=\"e1\"/>");
+			oos.writeObject("    <prov:wasDerivedFrom>\n" + 
+					"        <prov:generatedEntity prov:ref=\"e2\"/>\n" + 
+					"        <prov:usedEntity prov:ref=\"e1\"/>\n" + 
+					"    </prov:wasDerivedFrom>");
 			
 			
 			oos.close();

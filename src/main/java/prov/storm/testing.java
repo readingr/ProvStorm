@@ -6,8 +6,13 @@ import java.io.StringReader;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -16,7 +21,7 @@ import org.xml.sax.SAXException;
 public class testing {
 
 	
-	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException {
+	public static void main(String[] args) throws SAXException, IOException, ParserConfigurationException, XPathExpressionException {
 		String t = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" + 
 				"<prov:document xmlns:prov=\"http://www.w3.org/ns/prov#\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://example.org\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">\n" + 
 				"    <prov:entity prov:id=\"e1\"/>\n" + 
@@ -44,14 +49,22 @@ public class testing {
 
         NodeList nList = doc.getElementsByTagName("prov:wasDerivedFrom");
         
+    
         
+        
+        //this reads the XML.
         for (int i = 0; i < nList.getLength(); i++) {
 			Node nNode = nList.item(i);
+			
+			//cast to element so we can traverse.
+			Element docElement = (Element)nNode;
+		
+			System.out.println(docElement.getElementsByTagName("prov:generatedEntity").item(0).getAttributes().getNamedItem("prov:ref").getTextContent());			
 			System.out.println(nNode.getNodeName());
-//			System.out.println(nNode.getChildNodes().item(0));
-		}
+			System.out.println(docElement.getElementsByTagName("prov:usedEntity").item(0).getAttributes().getNamedItem("prov:ref").getTextContent());			
+			System.out.println("\n");
+        }
         
-        System.out.println(doc.getElementsByTagName("prov:entity").item(0).getAttributes().getNamedItem("prov:id").getTextContent());
 
 	}
 	
