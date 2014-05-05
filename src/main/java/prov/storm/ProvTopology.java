@@ -22,80 +22,84 @@ import java.util.Map;
  */
 public class ProvTopology {
 
-  public static class ProvBolt extends BaseRichBolt {
-    OutputCollector _collector;
-    String initialValue = "e1";
-    ArrayList<String> valuesToSearchFor;
+	public static class ProvBolt extends BaseRichBolt {
+		OutputCollector _collector;
+		String initialValue = "e1";
+		ArrayList<String> valuesToSearchFor;
 
-    @Override
-    public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
-      _collector = collector;
-      valuesToSearchFor = new ArrayList<String>();
-      valuesToSearchFor.add(initialValue);
-      
-
-    }
-
-    @Override
-    public void execute(Tuple tuple) {
-    	
-    	//this below emits the tuple onto a new stream, after appending three ! marks. 
-//      _collector.emit(tuple, new Values(tuple.getString(0) + "!!!" ));
-//      _collector.ack(tuple);
-      
-    	
-      //we check for the value we need.	
-      if (tuple.getString(0).equals("wasDerivedFrom")){
-    	  if(valuesToSearchFor.contains(tuple.getString(2))){
-    		  if(!valuesToSearchFor.contains(tuple.getString(1))){
-	 	    	 System.out.println("Value Found"); 
-		   	  	 System.out.println("Added "+tuple.getString(1)+ " to the list of values to search for"); 
-		   	  	 valuesToSearchFor.add(tuple.getString(1));
-    		  }
-
-    	  }
-      }
-      
-      
-    }
-
-    @Override
-    public void declareOutputFields(OutputFieldsDeclarer declarer) {
-      declarer.declare(new Fields("word"));
-    }
+		@Override
+		public void prepare(Map conf, TopologyContext context, OutputCollector collector) {
+			_collector = collector;
+			valuesToSearchFor = new ArrayList<String>();
+			valuesToSearchFor.add(initialValue);
 
 
-  }
+		}
 
-  public static void main(String[] args) throws Exception {
-    TopologyBuilder builder = new TopologyBuilder();
+		@Override
+		public void execute(Tuple tuple) {
 
-    //get the prov tuples from here
-    builder.setSpout("getProv", new TestWordSpout2(), 1);
-    
-    //pass them into the bolts, which will notify the user if they are found.
-    builder.setBolt("parseProv", new ProvBolt(), 1).shuffleGrouping("getProv");
+			//this below emits the tuple onto a new stream, after appending three ! marks. 
+			//      _collector.emit(tuple, new Values(tuple.getString(0) + "!!!" ));
+			//      _collector.ack(tuple);
 
-    Config conf = new Config();
-    
-    //false makes it easier to see output.
-    //set true if you want to see the executor and task output.
-    conf.setDebug(false);
 
-    //if it's not run locally.
-    if (args != null && args.length > 0) {
-      conf.setNumWorkers(1);
+			//we check for the value we need.	
+			if (tuple.getString(0).equals("wasDerivedFrom")){
+				if(valuesToSearchFor.contains(tuple.getString(2))){
+					if(!valuesToSearchFor.contains(tuple.getString(1))){
+//						System.out.println("Value Found"); 
+						System.out.println("Found "+tuple.getString(1)+ " added to the list of values to search for"); 
+						valuesToSearchFor.add(tuple.getString(1));
+					}
 
-      StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
-    }
-    else {
-    
-      System.out.println("Starting");
-      LocalCluster cluster = new LocalCluster();
-      cluster.submitTopology("test", conf, builder.createTopology());
-//      Utils.sleep(10000);
-//      cluster.killTopology("test");
-//      cluster.shutdown();
-    }
-  }
+				}
+			}
+
+
+		}
+
+		@Override
+		public void declareOutputFields(OutputFieldsDeclarer declarer) {
+			declarer.declare(new Fields("word"));
+		}
+
+
+	}
+
+
+
+	public static void main(String[] args) throws Exception {
+
+
+		TopologyBuilder builder = new TopologyBuilder();
+
+		//get the prov tuples from here
+		builder.setSpout("getProv", new ProvSpout(), 1);
+
+		//pass them into the bolts, which will notify the user if they are found.
+		builder.setBolt("parseProv", new ProvBolt(), 1).shuffleGrouping("getProv");
+
+		Config conf = new Config();
+
+		//false makes it easier to see output.
+		//set true if you want to see the executor and task output.
+		conf.setDebug(false);
+
+		//if it's not run locally.
+		if (args != null && args.length > 0) {
+			conf.setNumWorkers(1);
+
+			StormSubmitter.submitTopology(args[0], conf, builder.createTopology());
+		}
+		else {
+
+			System.out.println("Starting");
+			LocalCluster cluster = new LocalCluster();
+			cluster.submitTopology("test", conf, builder.createTopology());
+			//      Utils.sleep(10000);
+			//      cluster.killTopology("test");
+			//      cluster.shutdown();
+		}
+	}
 }
