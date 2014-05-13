@@ -5,7 +5,7 @@ This is a sample project for seeing if it is possible to use Storm in conjunctio
 
 This projects creates an XML stream of provenance, which outputs a random amount of wasDerivedFrom relationships, and at random intervals includes a relationship we're interested in. Storm starts off with a static entity we're looking for, and monitors the stream for these interested relationships. When derivations are found from the initial entity, it is added into an ArrayList, which is then used for searching.  
 
-This does not take into account transitive closures, it assumes the stream is ordered and consistent.
+This assumes the stream is ordered and consistent, and will not work with out-of-order streams.
 
 To get started:
 * Clone/download this repository
